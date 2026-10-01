@@ -1,17 +1,17 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey
-from db.base import Base
+from db.base import Base, GUID
 
 class StudentExamSheetDB(Base):
     __tablename__ = "student_exam_sheets"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    school_id = Column(String(36), ForeignKey("schools.id"), nullable=False, index=True)
-    student_id = Column(String(36), ForeignKey("students.id"), nullable=False, index=True)
-    exam_id = Column(String(36), ForeignKey("exams.id"), nullable=True)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    school_id = Column(GUID, ForeignKey("schools.id", ondelete="CASCADE"), nullable=False, index=True)
+    student_id = Column(GUID, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    exam_id = Column(GUID, ForeignKey("exams.id", ondelete="CASCADE"), nullable=True)
     exam_name = Column(String(120), nullable=True)
-    subject_id = Column(String(36), ForeignKey("subjects.id"), nullable=True)
+    subject_id = Column(GUID, ForeignKey("subjects.id", ondelete="CASCADE"), nullable=True)
     subject_name = Column(String(120), nullable=False)
     
     # AES-256 Encrypted file storage
@@ -30,5 +30,5 @@ class StudentExamSheetDB(Base):
     marks_awarded = Column(Float, nullable=True)
     max_marks = Column(Float, default=100.0)
     teacher_notes = Column(Text, nullable=True)
-    uploaded_by = Column(String(36), nullable=True)
+    uploaded_by = Column(GUID, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

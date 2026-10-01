@@ -1,14 +1,14 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, Date, Time, DateTime, Text, Boolean, ForeignKey
-from db.base import Base
+from sqlalchemy import Column, String, Integer, Date, DateTime, Text, Boolean, ForeignKey
+from db.base import Base, GUID
 
 class PTCEventDB(Base):
     """Parent-Teacher Conference Event announced by administration"""
     __tablename__ = "ptc_events"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    school_id = Column(String(36), ForeignKey("schools.id"), nullable=False, index=True)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    school_id = Column(GUID, ForeignKey("schools.id", ondelete="CASCADE"), nullable=False, index=True)
     title = Column(String(150), nullable=False)
     description = Column(Text, nullable=True)
     event_date = Column(Date, nullable=False)
@@ -24,9 +24,9 @@ class PTCSlotDB(Base):
     """Specific 15-minute slot for a teacher during a PTC event"""
     __tablename__ = "ptc_slots"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    event_id = Column(String(36), ForeignKey("ptc_events.id"), nullable=False, index=True)
-    teacher_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    event_id = Column(GUID, ForeignKey("ptc_events.id", ondelete="CASCADE"), nullable=False, index=True)
+    teacher_id = Column(GUID, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     start_time = Column(String(16), nullable=False) # e.g. "09:15"
     end_time = Column(String(16), nullable=False)   # e.g. "09:30"
     is_booked = Column(Boolean, default=False)
@@ -37,11 +37,11 @@ class PTCBookingDB(Base):
     """Parent booking of a PTC slot"""
     __tablename__ = "ptc_bookings"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    slot_id = Column(String(36), ForeignKey("ptc_slots.id"), nullable=False, unique=True, index=True)
-    event_id = Column(String(36), ForeignKey("ptc_events.id"), nullable=False)
-    student_id = Column(String(36), ForeignKey("students.id"), nullable=False)
-    parent_user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    slot_id = Column(GUID, ForeignKey("ptc_slots.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
+    event_id = Column(GUID, ForeignKey("ptc_events.id", ondelete="CASCADE"), nullable=False)
+    student_id = Column(GUID, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    parent_user_id = Column(GUID, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     agenda_topic = Column(String(255), nullable=True)
     status = Column(String(32), default="CONFIRMED") # CONFIRMED | CANCELLED | COMPLETED
     teacher_notes = Column(Text, nullable=True)

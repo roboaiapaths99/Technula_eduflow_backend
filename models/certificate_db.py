@@ -1,14 +1,14 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey
-from db.base import Base
+from db.base import Base, GUID
 
 class SchoolAssetDB(Base):
     """Stores school official assets: official stamp, principal digital signature, and crest"""
     __tablename__ = "school_assets"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    school_id = Column(String(36), ForeignKey("schools.id"), nullable=False, unique=True, index=True)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    school_id = Column(GUID, ForeignKey("schools.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
     stamp_image_url = Column(String(500), nullable=True)
     signature_image_url = Column(String(500), nullable=True)
     letterhead_header_url = Column(String(500), nullable=True)
@@ -22,10 +22,10 @@ class CertificateRequestDB(Base):
     """Tracks certificate applications by parents/students, admin approval queue, and issued certificates"""
     __tablename__ = "certificate_requests"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    school_id = Column(String(36), ForeignKey("schools.id"), nullable=False, index=True)
-    student_id = Column(String(36), ForeignKey("students.id"), nullable=False, index=True)
-    parent_user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    school_id = Column(GUID, ForeignKey("schools.id", ondelete="CASCADE"), nullable=False, index=True)
+    student_id = Column(GUID, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    parent_user_id = Column(GUID, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     
     # TRANSFER_CERTIFICATE | BONAFIDE | CHARACTER | FEE_CLEARANCE
     certificate_type = Column(String(64), nullable=False)
