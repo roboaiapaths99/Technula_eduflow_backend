@@ -1,0 +1,21 @@
+{
+  "school": { "id": "GVPS", "name": "Green Valley Public School" },
+  "class_section": { "id": "6A", "grade": 6, "section": "A" },
+  "subjects": ["English", "Maths", "Science"],
+  "students": [
+    { "admission_no": "GVPS-6A-001", "name": "Aarav Sharma" },
+    { "admission_no": "GVPS-6A-002", "name": "Sara Khan" },
+    { "admission_no": "GVPS-6A-003", "name": "Kabir Verma" }
+  ],
+  "exams": [
+    { "exam_id": "UT1", "name": "Unit Test 1", "date": "2025-07-15" },
+    { "exam_id": "MID", "name": "Mid Term", "date": "2025-09-20" },
+    { "exam_id": "FIN", "name": "Final", "date": "2025-12-05" }
+  ],
+  "marks": [
+    { "exam_id": "UT1", "admission_no": "GVPS-6A-001", "max_marks": 100,
+      "scores": { "English": 78, "Maths": 82, "Science": 70 } },
+    { "exam_id": "UT1", "admission_no": "GVPS-6A-002", "max_marks": 100,
+      "scores": { "English": 84, "Maths": 77, "Science": 73 } }
+  ]
+}

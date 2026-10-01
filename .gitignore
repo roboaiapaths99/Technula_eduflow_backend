@@ -1,0 +1,40 @@
+# Environments & Secrets — STRICT: Never commit production credentials
+.env
+.env.*
+!.env.example
+!.env.production.example
+*firebase*.json
+*service-account*.json
+*.pem
+*.key
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+env/
+.venv/
+ENV/
+
+# Databases & Local Storage
+*.db
+*.sqlite
+*.sqlite3
+insights.db
+school.db
+academics_insights.db
+static/uploads/*
+!static/uploads/.gitkeep
+static/school_assets/*
+!static/school_assets/.gitkeep
+
+# Logs & OS artifacts
+*.log
+.DS_Store
+Thumbs.db
