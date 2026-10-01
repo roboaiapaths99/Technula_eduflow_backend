@@ -11,8 +11,10 @@ from datetime import date
 from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
-import pypdf
-
+try:
+    import pypdf
+except ImportError:
+    pypdf = None
 from db.session import get_db
 from models.timetable_db import TimetableSlotDB
 from models.subject import Subject

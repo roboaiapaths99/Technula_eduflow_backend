@@ -15,3 +15,8 @@ pymongo
 requests
 boto3
 reportlab
+pypdf
+Pillow
+firebase-admin
+google-generativeai
+alembic
