@@ -39,7 +39,10 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "http://localhost:8081",
-        "https://insights.agpkacademy.in"
+        "http://localhost:8087",
+        "https://eduflow.technula.com",
+        "https://technulaeduflow.technula.com",
+        "*"
     ]
 
     # ── MULTI-TENANT PAYMENT ENCRYPTION (SCHOOL FEE CREDENTIALS) ─────────
