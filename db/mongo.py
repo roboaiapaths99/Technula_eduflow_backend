@@ -4,8 +4,11 @@ Supports local MongoDB and MongoDB Atlas (mongodb+srv://...).
 Includes lazy connection, connection caching, and graceful circuit breaker fallback.
 """
 import logging
-import time
-from pymongo import MongoClient
+try:
+    from pymongo import MongoClient
+except ImportError:
+    MongoClient = None
+
 from core.config import settings
 
 logger = logging.getLogger("db.mongo")
@@ -19,6 +22,8 @@ _COOLDOWN_SECONDS = 60.0  # Avoid blocking request threads if Mongo is offline
 def get_mongo_db():
     """Get MongoDB database instance with lazy connection and circuit breaker."""
     global _client, _db, _last_failure_time
+    if MongoClient is None:
+        return None
     if _db is not None:
         return _db
 

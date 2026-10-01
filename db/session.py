@@ -16,10 +16,11 @@ database_url = settings.DATABASE_URL
 
 # Check if PostgreSQL is specified
 if "postgresql" in database_url:
+    norm_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1) if database_url.startswith("postgresql://") else database_url
     try:
         # Test connection briefly
         test_engine = create_engine(
-            database_url,
+            norm_url,
             pool_size=5,
             max_overflow=5,
             pool_pre_ping=True,
