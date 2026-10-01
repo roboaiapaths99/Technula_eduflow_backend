@@ -4,7 +4,7 @@
 # ==============================================================================
 set -e
 
-DOMAIN="eduflow.technula.com"
+DOMAIN="technulaeduflow.technula.com"
 EMAIL="admin@technula.com"
 
 echo "=========================================================="
