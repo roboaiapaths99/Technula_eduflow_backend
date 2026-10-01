@@ -4,6 +4,7 @@ Supports local MongoDB and MongoDB Atlas (mongodb+srv://...).
 Includes lazy connection, connection caching, and graceful circuit breaker fallback.
 """
 import logging
+import time
 try:
     from pymongo import MongoClient
 except ImportError:
