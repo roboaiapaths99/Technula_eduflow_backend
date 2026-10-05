@@ -1,11 +1,11 @@
 #!/bin/bash
 # ==============================================================================
 # Technula EduFlow — Automated VPS Deployment Setup Script
-# Domain: eduflow.technula.com
+# Domain: technulaeduflow.technula.com
 # ==============================================================================
 set -e
 
-DOMAIN="eduflow.technula.com"
+DOMAIN="technulaeduflow.technula.com"
 EMAIL="admin@technula.com"
 
 echo "=========================================================="

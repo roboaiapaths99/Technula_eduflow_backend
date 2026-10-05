@@ -4,7 +4,7 @@
 # ==============================================================================
 set -e
 
-DOMAIN="eduflow.technula.com"
+DOMAIN="technulaeduflow.technula.com"
 EMAIL="admin@technula.com"
 
 echo "=========================================================="
@@ -82,7 +82,7 @@ echo "⚙️ Configuring Host Nginx for ${DOMAIN}..."
 sudo tee /etc/nginx/sites-available/${DOMAIN} > /dev/null << 'EOF'
 server {
     listen 80;
-    server_name eduflow.technula.com;
+    server_name technulaeduflow.technula.com eduflow.technula.com;
     client_max_body_size 100M;
 
     location /api/ {
