@@ -159,7 +159,7 @@ def seed_credentials():
                 ("Computer Science", "CS-10"),
             ]
             created_subjects = []
-            for sub_name, sub_code in subjects_data:
+            for idx, (sub_name, sub_code) in enumerate(subjects_data):
                 sub = db.query(Subject).filter(
                     Subject.school_id == school.id,
                     Subject.code == sub_code
@@ -169,7 +169,7 @@ def seed_credentials():
                         school_id=school.id,
                         name=sub_name,
                         code=sub_code,
-                        grade="10",
+                        sort_order=idx + 1,
                     )
                     db.add(sub)
                     db.commit()
@@ -188,10 +188,11 @@ def seed_credentials():
                 exam = Exam(
                     school_id=school.id,
                     name="Mid-Term Assessment 2026",
-                    grade="10",
+                    exam_type="Mid Term",
                     term="Mid-Term Assessment 2026",
-                    academic_year="2026-27",
-                    exam_date=date.today() - timedelta(days=20),
+                    grade="10",
+                    date=date.today() - timedelta(days=20),
+                    total_marks=500.0,
                     is_published=True,
                 )
                 db.add(exam)
@@ -201,11 +202,11 @@ def seed_credentials():
 
             # Marks per subject
             sample_scores = {
-                "MATH-10": (94.0, 100.0, "A1", "Outstanding mathematical reasoning and accuracy."),
-                "SCI-10": (91.0, 100.0, "A1", "Excellent practical lab work and conceptual grasp."),
-                "ENG-10": (86.0, 100.0, "A2", "Strong reading comprehension and creative writing."),
-                "SST-10": (88.0, 100.0, "A2", "Very good understanding of history and geography."),
-                "CS-10": (96.0, 100.0, "A1", "Top marks in programming and data structure fundamentals."),
+                "MATH-10": (94.0, 100.0, "A1"),
+                "SCI-10": (91.0, 100.0, "A1"),
+                "ENG-10": (86.0, 100.0, "A2"),
+                "SST-10": (88.0, 100.0, "A2"),
+                "CS-10": (96.0, 100.0, "A1"),
             }
 
             for sub in created_subjects:
@@ -215,23 +216,22 @@ def seed_credentials():
                     Mark.subject_id == sub.id
                 ).first()
 
-                score_info = sample_scores.get(sub.code, (85.0, 100.0, "A2", "Good performance."))
+                score_info = sample_scores.get(sub.code, (85.0, 100.0, "A2"))
                 if not mark:
                     mark = Mark(
-                        exam_id=exam.id,
+                        school_id=school.id,
                         student_id=student.id,
+                        exam_id=exam.id,
                         subject_id=sub.id,
                         marks_obtained=score_info[0],
                         max_marks=score_info[1],
-                        grade=score_info[2],
-                        remarks=score_info[3],
+                        grade_letter=score_info[2],
                     )
                     db.add(mark)
                 else:
                     mark.marks_obtained = score_info[0]
                     mark.max_marks = score_info[1]
-                    mark.grade = score_info[2]
-                    mark.remarks = score_info[3]
+                    mark.grade_letter = score_info[2]
             db.commit()
             print(f"[+] Seeded Verified Marks for {student.name}")
 
