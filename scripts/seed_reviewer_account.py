@@ -243,7 +243,7 @@ def seed_reviewer():
                             student_id=student.id,
                             date=att_date,
                             status=status,
-                            remarks=remarks,
+                            reason=remarks,
                         ))
                 db.commit()
                 print(f"[+] Seeded 30 Days of Real Daily Attendance for {student.name}")
@@ -257,12 +257,16 @@ def seed_reviewer():
             if not fee_struct:
                 fee_struct = FeeStructureDB(
                     school_id=school.id,
-                    title="Class 10 Annual Comprehensive Fee",
-                    grade="10",
                     academic_year="2026-27",
+                    grade="10",
+                    fee_head="Tuition & Annual Composite Fee",
                     total_amount=37500.0,
-                    breakdown_json='{"Tuition": 30000, "Laboratory": 4500, "Library": 3000}',
+                    installment_name="Annual",
                     due_date=date.today() + timedelta(days=60),
+                    grace_period_days=10,
+                    late_fine_per_day=50.0,
+                    is_optional=False,
+                    is_active=True
                 )
                 db.add(fee_struct)
                 db.commit()
@@ -275,23 +279,31 @@ def seed_reviewer():
                     school_id=school.id,
                     student_id=student.id,
                     fee_structure_id=fee_struct.id,
-                    amount_paid=12500.0,
+                    receipt_no="RCP-2026-0412",
+                    base_amount_paid=12500.0,
+                    fine_amount_paid=0.0,
+                    discount_waiver=0.0,
+                    total_paid=12500.0,
+                    payment_mode="UPI_ONLINE",
+                    transaction_ref="UPI/120938472910",
+                    gateway_status="COMPLETED",
                     payment_date=date.today() - timedelta(days=120),
-                    payment_mode="UPI",
-                    transaction_reference="UPI/120938472910",
-                    receipt_number="RCP-2026-0412",
-                    status="VERIFIED",
+                    remarks="Term 1 Fee Payment - Verified"
                 )
                 p2 = FeePaymentDB(
                     school_id=school.id,
                     student_id=student.id,
                     fee_structure_id=fee_struct.id,
-                    amount_paid=12500.0,
+                    receipt_no="RCP-2026-0891",
+                    base_amount_paid=12500.0,
+                    fine_amount_paid=0.0,
+                    discount_waiver=0.0,
+                    total_paid=12500.0,
+                    payment_mode="UPI_ONLINE",
+                    transaction_ref="UPI/839201928374",
+                    gateway_status="COMPLETED",
                     payment_date=date.today() - timedelta(days=50),
-                    payment_mode="UPI",
-                    transaction_reference="UPI/839201928374",
-                    receipt_number="RCP-2026-0891",
-                    status="VERIFIED",
+                    remarks="Term 2 Fee Payment - Verified"
                 )
                 db.add_all([p1, p2])
                 db.commit()
@@ -305,25 +317,28 @@ def seed_reviewer():
             ).count()
 
             if existing_slots == 0:
-                days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-                periods = [
-                    ("08:30", "09:15", "Mathematics", "Room 101"),
-                    ("09:20", "10:05", "Science & Physics", "Lab 2"),
-                    ("10:10", "10:55", "English Core", "Room 101"),
-                    ("11:30", "12:15", "Social Studies", "Room 101"),
-                    ("12:20", "13:05", "Computer Science", "Comp Lab 1"),
-                ]
-                for day in days:
-                    for start_t, end_t, sub_name, room in periods:
+                for day_idx in range(5):
+                    periods = [
+                        (1, "08:30", "09:15", "Mathematics", "Room 101"),
+                        (2, "09:20", "10:05", "Science & Physics", "Lab 2"),
+                        (3, "10:10", "10:55", "English Core", "Room 101"),
+                        (4, "11:30", "12:15", "Social Studies", "Room 101"),
+                        (5, "12:20", "13:05", "Computer Science", "Comp Lab 1"),
+                    ]
+                    for p_num, start_t, end_t, sub_name, room in periods:
+                        sub = db.query(Subject).filter(Subject.school_id == school.id, Subject.name == sub_name).first()
                         db.add(TimetableSlotDB(
                             school_id=school.id,
+                            academic_year="2026-27",
                             grade="10",
                             section="A",
-                            day_of_week=day,
+                            day_of_week=day_idx,
+                            period_number=p_num,
                             start_time=start_t,
                             end_time=end_t,
-                            subject_name=sub_name,
+                            subject_id=sub.id if sub else None,
                             room_number=room,
+                            slot_type="CLASS"
                         ))
                 db.commit()
                 print(f"[+] Seeded Class 10-A Timetable Schedule")
@@ -335,14 +350,16 @@ def seed_reviewer():
                     school_id=school.id,
                     title="Annual Sports Meet 2026",
                     content="We are pleased to announce our Annual Sports Meet scheduled for next month. All students must wear house uniforms.",
-                    target_audience="All",
+                    target_role="ALL",
+                    is_pinned=True,
                     created_at=datetime.now(timezone.utc) - timedelta(days=2),
                 )
                 ann2 = AnnouncementDB(
                     school_id=school.id,
                     title="Parent-Teacher Meeting (PTM) Schedule",
                     content="Mid-term PTM will be held this Saturday between 9:00 AM and 1:00 PM. Parents can discuss term exam performance.",
-                    target_audience="Parents",
+                    target_role="PARENTS",
+                    is_pinned=False,
                     created_at=datetime.now(timezone.utc) - timedelta(days=5),
                 )
                 db.add_all([ann1, ann2])
