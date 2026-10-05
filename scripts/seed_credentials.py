@@ -63,37 +63,10 @@ def seed_credentials():
             print(f"[*] Seeding Real Credentials for School: {school.name} ({school.id})")
             print(f"==================================================")
 
-            # 1. Create or update Parent User (Arun Patel)
-            parent = db.query(UserDB).filter(
-                UserDB.school_id == school.id,
-                UserDB.phone == "9811223344",
-                UserDB.role == "Parent"
-            ).first()
-
-            if not parent:
-                parent = UserDB(
-                    school_id=school.id,
-                    email=f"arun.patel@{school.code or 'dpis'}.edu".lower(),
-                    phone="9811223344",
-                    full_name="Arun Patel",
-                    password_hash=hash_password("reviewer123"),
-                    role="Parent",
-                    email_verified=True,
-                )
-                db.add(parent)
-                db.commit()
-                db.refresh(parent)
-                print(f"[+] Created Parent User: {parent.full_name} | Phone: {parent.phone} | ID: {parent.id}")
-            else:
-                parent.full_name = "Arun Patel"
-                parent.email = f"arun.patel@{school.code or 'dpis'}.edu".lower()
-                db.commit()
-                print(f"[=] Verified Parent User: {parent.full_name} | ID: {parent.id}")
-
-            # 2. Create or update Student (Aarav Patel)
+            # 1. Create or update Student (Aarav Patel) with both phone numbers
             student = db.query(StudentDB).filter(
                 StudentDB.school_id == school.id,
-                (StudentDB.father_phone == "9811223344") | (StudentDB.admission_no == "ADM-2026-1001")
+                (StudentDB.father_phone == "9811223344") | (StudentDB.mother_phone == "9911223344") | (StudentDB.admission_no == "ADM-2026-1001")
             ).first()
 
             if not student:
@@ -110,7 +83,7 @@ def seed_credentials():
                     father_name="Arun Patel",
                     father_phone="9811223344",
                     mother_name="Pooja Patel",
-                    mother_phone="9811223345",
+                    mother_phone="9911223344",
                     emergency_contact_name="Arun Patel",
                     emergency_contact_phone="9811223344",
                     address="Flat 402, Royal Palms, Sector 15",
@@ -122,33 +95,65 @@ def seed_credentials():
                 print(f"[+] Created Student: {student.name} | Class: {student.grade}-{student.section} | ID: {student.id}")
             else:
                 student.father_phone = "9811223344"
+                student.mother_phone = "9911223344"
                 student.father_name = "Arun Patel"
                 student.name = "Aarav Patel"
                 db.commit()
-                print(f"[=] Verified Student: {student.name} | ID: {student.id}")
+                print(f"[=] Verified Student: {student.name} (F: 9811223344, M: 9911223344) | ID: {student.id}")
 
-            # 3. Create or verify ParentStudent Link
-            link = db.query(ParentStudentDB).filter(
-                ParentStudentDB.parent_user_id == parent.id,
-                ParentStudentDB.student_id == student.id
-            ).first()
+            # 2. Create or update Parent Users for both numbers
+            phone_entries = [
+                ("9811223344", "Arun Patel", "Father"),
+                ("9911223344", "Pooja Patel", "Mother"),
+            ]
+            for p_num, p_name, p_rel in phone_entries:
+                parent_user = db.query(UserDB).filter(
+                    UserDB.school_id == school.id,
+                    UserDB.phone == p_num,
+                    UserDB.role == "Parent"
+                ).first()
 
-            if not link:
-                link = ParentStudentDB(
-                    parent_user_id=parent.id,
-                    student_id=student.id,
-                    relation="Father",
-                    is_primary=True,
-                    is_verified=True,
-                )
-                db.add(link)
-                db.commit()
-                print(f"[+] Linked Parent ({parent.full_name}) <--> Student ({student.name})")
-            else:
-                link.is_primary = True
-                link.is_verified = True
-                db.commit()
-                print(f"[=] Parent-Student Link verified and active.")
+                if not parent_user:
+                    parent_user = UserDB(
+                        school_id=school.id,
+                        email=f"{p_name.lower().replace(' ', '.')}@{school.code or 'dpis'}.edu".lower(),
+                        phone=p_num,
+                        full_name=p_name,
+                        password_hash=hash_password("reviewer123"),
+                        role="Parent",
+                        email_verified=True,
+                    )
+                    db.add(parent_user)
+                    db.commit()
+                    db.refresh(parent_user)
+                    print(f"[+] Created Parent User: {parent_user.full_name} | Phone: {parent_user.phone}")
+                else:
+                    parent_user.full_name = p_name
+                    db.commit()
+                    print(f"[=] Verified Parent User: {parent_user.full_name} | Phone: {parent_user.phone}")
+
+                # 3. Create or verify ParentStudent Link
+                link = db.query(ParentStudentDB).filter(
+                    ParentStudentDB.parent_user_id == parent_user.id,
+                    ParentStudentDB.student_id == student.id
+                ).first()
+
+                if not link:
+                    link = ParentStudentDB(
+                        parent_user_id=parent_user.id,
+                        student_id=student.id,
+                        relation=p_rel,
+                        is_primary=True,
+                        is_verified=True,
+                    )
+                    db.add(link)
+                    db.commit()
+                    print(f"[+] Linked Parent ({parent_user.full_name}) <--> Student ({student.name})")
+                else:
+                    link.is_primary = True
+                    link.is_verified = True
+                    db.commit()
+                    print(f"[=] Parent-Student Link verified and active.")
 
             # 4. Ensure Subjects Exist
             subjects_data = [
@@ -393,24 +398,25 @@ def seed_credentials():
                 db.commit()
                 print(f"[+] Seeded Real School Announcements")
 
-            # 10. Seed Active Reviewer OTP Token in Database
-            cache_key = f"{school.id}:9811223344"
-            db.query(OtpTokenDB).filter(
-                OtpTokenDB.token_type == "PARENT_OTP",
-                OtpTokenDB.identifier == cache_key
-            ).delete()
-            otp_entry = OtpTokenDB(
-                token_type="PARENT_OTP",
-                identifier=cache_key,
-                token="123456",
-                school_id=school.id,
-                expires_at=datetime(2035, 1, 1, tzinfo=timezone.utc),
-                is_used=False,
-                attempts=0,
-            )
-            db.add(otp_entry)
+            # 10. Seed Active Reviewer OTP Tokens in Database for both numbers
+            for p_num in ["9811223344", "9911223344"]:
+                cache_key = f"{school.id}:{p_num}"
+                db.query(OtpTokenDB).filter(
+                    OtpTokenDB.token_type == "PARENT_OTP",
+                    OtpTokenDB.identifier == cache_key
+                ).delete()
+                otp_entry = OtpTokenDB(
+                    token_type="PARENT_OTP",
+                    identifier=cache_key,
+                    token="123456",
+                    school_id=school.id,
+                    expires_at=datetime(2035, 1, 1, tzinfo=timezone.utc),
+                    is_used=False,
+                    attempts=0,
+                )
+                db.add(otp_entry)
             db.commit()
-            print(f"[+] Seeded Verified Login Token: 123456 (Stored in Database otp_tokens)")
+            print(f"[+] Seeded Verified Login Token: 123456 for 9811223344 & 9911223344 (Stored in Database otp_tokens)")
 
         print(f"\n[SUCCESS] Credentials seeding completed! 100% real database data flow ready.\n")
 
