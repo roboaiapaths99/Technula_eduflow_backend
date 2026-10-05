@@ -299,17 +299,20 @@ def seed_credentials():
             # Verified Payments
             payments = db.query(FeePaymentDB).filter(FeePaymentDB.student_id == student.id).all()
             if not payments:
+                sch_code = str(school.id).replace("-", "")[:4].upper()
+                r1 = f"RCP-2026-{sch_code}-0412"
+                r2 = f"RCP-2026-{sch_code}-0891"
                 p1 = FeePaymentDB(
                     school_id=school.id,
                     student_id=student.id,
                     fee_structure_id=fee_struct.id,
-                    receipt_no="RCP-2026-0412",
+                    receipt_no=r1,
                     base_amount_paid=12500.0,
                     fine_amount_paid=0.0,
                     discount_waiver=0.0,
                     total_paid=12500.0,
                     payment_mode="UPI_ONLINE",
-                    transaction_ref="UPI/120938472910",
+                    transaction_ref=f"UPI/{sch_code}12093847",
                     gateway_status="COMPLETED",
                     payment_date=date.today() - timedelta(days=120),
                     remarks="Term 1 Fee Payment - Verified"
@@ -318,20 +321,20 @@ def seed_credentials():
                     school_id=school.id,
                     student_id=student.id,
                     fee_structure_id=fee_struct.id,
-                    receipt_no="RCP-2026-0891",
+                    receipt_no=r2,
                     base_amount_paid=12500.0,
                     fine_amount_paid=0.0,
                     discount_waiver=0.0,
                     total_paid=12500.0,
                     payment_mode="UPI_ONLINE",
-                    transaction_ref="UPI/839201928374",
+                    transaction_ref=f"UPI/{sch_code}83920192",
                     gateway_status="COMPLETED",
                     payment_date=date.today() - timedelta(days=50),
                     remarks="Term 2 Fee Payment - Verified"
                 )
                 db.add_all([p1, p2])
                 db.commit()
-                print(f"[+] Seeded Verified Fee Payment Receipts (RCP-2026-0412, RCP-2026-0891)")
+                print(f"[+] Seeded Verified Fee Payment Receipts ({r1}, {r2})")
 
             # 8. Timetable
             existing_slots = db.query(TimetableSlotDB).filter(
