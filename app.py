@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
 import asyncio
 from pathlib import Path
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+logger = logging.getLogger(__name__)
 
 from core.config import settings
 from api import api_router
