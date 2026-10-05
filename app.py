@@ -182,6 +182,18 @@ def public_privacy_policy():
 
 
 
+@app.post("/api/system/seed-reviewer-db", tags=["System"])
+def api_seed_reviewer_db():
+    """Seeds real parent, student, marks, attendance, and fee database records for Google Play reviewer."""
+    from scripts.seed_reviewer_account import seed_reviewer
+    try:
+        seed_reviewer()
+        return {"success": True, "message": "Database seeded successfully with real reviewer account and records."}
+    except Exception as e:
+        logger.error(f"Error seeding reviewer db: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
