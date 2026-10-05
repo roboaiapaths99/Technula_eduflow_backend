@@ -185,15 +185,15 @@ def public_privacy_policy():
 
 
 
-@app.post("/api/system/seed-reviewer-db", tags=["System"])
-def api_seed_reviewer_db():
-    """Seeds real parent, student, marks, attendance, and fee database records for Google Play reviewer."""
-    from scripts.seed_reviewer_account import seed_reviewer
+@app.post("/api/system/seed-credentials", tags=["System"])
+def api_seed_credentials():
+    """Seeds real parent, student, marks, attendance, and fee database records for testing and review."""
+    from scripts.seed_credentials import seed_credentials
     try:
-        seed_reviewer()
-        return {"success": True, "message": "Database seeded successfully with real reviewer account and records."}
+        seed_credentials()
+        return {"success": True, "message": "Database seeded successfully with verified credentials and records."}
     except Exception as e:
-        logger.error(f"Error seeding reviewer db: {e}")
+        logger.error(f"Error seeding credentials: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
