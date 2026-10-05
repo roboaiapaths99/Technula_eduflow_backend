@@ -529,3 +529,30 @@ def reject_profile_change(
     db.commit()
 
     return {"success": True, "message": "Profile change request rejected."}
+
+
+@router.post("/request-account-deletion")
+def request_account_deletion(
+    payload: dict,
+    user: UserDB = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Google Play Store compliance endpoint: Allows parents/users to request account and personal data deletion.
+    """
+    reason = payload.get("reason", "User requested account closure")
+    change_req = ProfileChangeRequestDB(
+        school_id=user.school_id,
+        user_id=user.id,
+        field_name="account_deletion_request",
+        old_value="active",
+        new_value="requested_deletion",
+        status="pending",
+        rejection_reason=f"Reason: {reason}",
+    )
+    db.add(change_req)
+    db.commit()
+    return {
+        "success": True,
+        "message": "Your account deletion request has been received. Your profile and stored session data will be purged in accordance with our student data privacy policy."
+    }
