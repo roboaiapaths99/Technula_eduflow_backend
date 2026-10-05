@@ -272,7 +272,7 @@ def get_parent_children(
             is_bday = (student.dob.month == today.month and student.dob.day == today.day)
             if is_bday:
                 tpl = getattr(school, "birthday_template", None) or "Dear Parent, {school_name} extends warmest wishes to {student_name} (Class {grade}) on their Birthday! May this year bring happiness and success! 🎂🎉"
-                bday_msg = tpl.replace("{school_name}", school.name or "Academic Insights").replace(
+                bday_msg = tpl.replace("{school_name}", school.name or "Technula EduFlow").replace(
                     "{student_name}", student.name
                 ).replace("{grade}", f"{student.grade}-{student.section}")
 
@@ -547,7 +547,7 @@ def get_student_parent_overview(
         },
         "school": {
             "id": str(school.id) if school else None,
-            "name": school.name if school else "Academic Insights Academy",
+            "name": school.name if school else "Technula EduFlow",
             "board": school.board if school else "CBSE",
         },
         "attendance": {

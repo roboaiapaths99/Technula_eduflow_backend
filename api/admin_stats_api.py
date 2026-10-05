@@ -139,7 +139,7 @@ def get_weekly_executive_report(
     """
     target_school_id = _get_effective_school_id(current_user, school_id)
     school = db.query(SchoolDB).filter(SchoolDB.id == target_school_id).first()
-    school_name = school.name if school else "Academic Insights Academy"
+    school_name = school.name if school else "Technula EduFlow"
 
     today = date.today()
     start_date = today - timedelta(days=6)

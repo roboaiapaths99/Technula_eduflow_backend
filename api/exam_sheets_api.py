@@ -45,7 +45,7 @@ router = APIRouter(
 STORAGE_DIR = Path(__file__).resolve().parent.parent / "encrypted_storage" / "exam_sheets"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-_secret_raw = (getattr(settings, "JWT_SECRET_KEY", None) or "academic-insights-secure-secret-key-32").encode()
+_secret_raw = (getattr(settings, "JWT_SECRET_KEY", None) or "technula-eduflow-secure-secret-key-32").encode()
 _master_key = base64.urlsafe_b64encode((_secret_raw * 2)[:32])
 cipher = Fernet(_master_key)
 

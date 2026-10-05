@@ -1,5 +1,5 @@
 """
-Seed comprehensive demo data for Academic Insights AI.
+Seed comprehensive demo data for Technula EduFlow.
 Creates:
 - 2 Schools (Delhi Public International School, St. Xavier's)
 - Admin, Teachers, Parents

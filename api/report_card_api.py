@@ -128,7 +128,7 @@ def get_report_card_data(
 
     return {
         "school": {
-            "name": school.name if school else "Academic Insights Academy",
+            "name": school.name if school else "Technula EduFlow",
             "address": school.address if school else "CBSE Affiliated",
             "phone": school.phone if school else "N/A",
             "logo_url": school.logo_url if school else None,

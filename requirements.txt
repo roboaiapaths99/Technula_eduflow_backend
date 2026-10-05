@@ -20,3 +20,4 @@ Pillow
 firebase-admin
 google-generativeai
 alembic
+pytesseract

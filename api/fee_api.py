@@ -188,7 +188,7 @@ def test_payment_gateway_connection(
                 "https://api.razorpay.com/v1/payments?count=1",
                 headers={
                     "Authorization": f"Basic {b64_auth}",
-                    "User-Agent": "AcademicInsights-SchoolOS/1.0"
+                    "User-Agent": "TechnulaEduFlow/2.0"
                 }
             )
             with urllib.request.urlopen(req, timeout=5) as resp:
@@ -229,7 +229,7 @@ def test_payment_gateway_connection(
                 "https://api.stripe.com/v1/balance",
                 headers={
                     "Authorization": f"Bearer {raw_secret}",
-                    "User-Agent": "AcademicInsights-SchoolOS/1.0"
+                    "User-Agent": "TechnulaEduFlow/2.0"
                 }
             )
             with urllib.request.urlopen(req, timeout=5) as resp:

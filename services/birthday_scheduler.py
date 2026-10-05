@@ -60,7 +60,7 @@ def run_daily_birthday_wishes():
                 phone = (link.parent.phone if link and link.parent else None) or s.father_phone or s.mother_phone
                 email = (link.parent.email if link and link.parent else None)
 
-                msg = template.replace("{school_name}", school.name or "Academic Insights").replace(
+                msg = template.replace("{school_name}", school.name or "Technula EduFlow").replace(
                     "{student_name}", s.name
                 ).replace("{grade}", f"{s.grade}-{s.section}")
 
