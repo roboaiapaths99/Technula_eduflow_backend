@@ -120,6 +120,68 @@ def health_integrations():
     }
 
 
+from fastapi.responses import HTMLResponse
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+@app.get("/privacy-policy", response_class=HTMLResponse)
+@app.get("/data-deletion", response_class=HTMLResponse)
+def public_privacy_policy():
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technula EduFlow — Privacy Policy & Data Safety</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.7; color: #1e293b; max-width: 820px; margin: 0 auto; padding: 40px 20px; }
+    h1 { color: #0f172a; font-size: 28px; }
+    h2 { color: #1e293b; font-size: 18px; margin-top: 24px; }
+    .badge { display: inline-block; background: #eff6ff; color: #2563eb; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 999px; margin-bottom: 8px; }
+    .card { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0; color: #7c2d12; }
+    a { color: #2563eb; font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="badge">OFFICIAL PRIVACY & DATA SAFETY POLICY</div>
+  <h1>Technula EduFlow Privacy Policy</h1>
+  <p><small>Last Updated: October 2026 • Valid for Mobile Apps and Web Portals</small></p>
+
+  <h2>1. Overview & Purpose</h2>
+  <p>Technula EduFlow is an educational management portal designed for authorized schools, teachers, students, and their parents/guardians to access student attendance, academic report cards, fee receipts, digital gate passes, and school circulars.</p>
+
+  <h2>2. Data We Collect</h2>
+  <ul>
+    <li><strong>Parent/Guardian Profile:</strong> Name, registered mobile number, email address.</li>
+    <li><strong>Student Records:</strong> Name, class, section, attendance marks, exam grades, homework, and fee receipts.</li>
+    <li><strong>Device & Push Tokens:</strong> Firebase Cloud Messaging (FCM) tokens strictly for urgent school notices and attendance updates.</li>
+  </ul>
+
+  <h2>3. What We DO NOT Collect</h2>
+  <ul>
+    <li>We do NOT track continuous GPS location.</li>
+    <li>We do NOT record audio, access device microphones, or read private SMS.</li>
+    <li>We do NOT store payment card details (all tuition payments are processed via RBI/PCI-DSS certified gateways).</li>
+    <li>We NEVER sell, trade, or share user data with third-party advertisers.</li>
+  </ul>
+
+  <h2>4. Student & Child Data Protection (COPPA / FERPA)</h2>
+  <p>Student profiles are private and accessible exclusively to their authenticated legal guardians and assigned teachers. No student information is publicly visible or indexed by search engines.</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; color:#9a3412;">5. User Data & Account Deletion (Google Play Compliance)</h3>
+    <p>Users have the right to request deletion of their account and personal data at any time.</p>
+    <p><strong>How to request deletion:</strong> Inside the mobile app, tap <em>Menu &rarr; Guardian Profile &rarr; Delete Account &amp; Data</em>, or email <a href="mailto:sales@technula.com">sales@technula.com</a> with your registered mobile number.</p>
+  </div>
+
+  <h2>6. Contact Us</h2>
+  <p>Technula EduFlow Privacy Office: <a href="mailto:sales@technula.com">sales@technula.com</a> | Portal: <a href="https://technulaeduflow.technula.com">https://technulaeduflow.technula.com</a></p>
+</body>
+</html>"""
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(

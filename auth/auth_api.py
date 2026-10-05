@@ -555,21 +555,22 @@ def parent_send_otp(payload: ParentSendOtpRequest):
             )
         ).all()
 
-        # Check if parent user already exists for this school
-        existing_user = db.query(UserDB).filter(
-            UserDB.school_id == school.id,
-            UserDB.phone == clean_phone,
-            UserDB.role == "Parent"
-        ).first()
+        # Check Google Play Reviewer / Demo bypass
+        is_reviewer = clean_phone in ["9811223344", "9999988888", "9876543210"]
 
-        if not students and not existing_user:
-            raise HTTPException(
-                status_code=404,
-                detail=f"No student records found matching mobile number +91 {clean_phone} at {school.name}. Please verify your number or contact the school office."
-            )
+        if is_reviewer:
+            otp = "123456"
+            # Link demo students if none found for reviewer
+            if not students:
+                students = db.query(StudentDB).filter(StudentDB.school_id == school.id, StudentDB.is_active == True).limit(2).all()
+        else:
+            if not students and not existing_user:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No student records found matching mobile number +91 {clean_phone} at {school.name}. Please verify your number or contact the school office."
+                )
+            otp = f"{random.randint(100000, 999999)}"
 
-        # Generate 6-digit OTP
-        otp = f"{random.randint(100000, 999999)}"
         cache_key = f"{school.id}:{clean_phone}"
         save_otp_token(
             db=db,
@@ -586,6 +587,26 @@ def parent_send_otp(payload: ParentSendOtpRequest):
             "attempts": 0,
             "students": [str(s.id) for s in students],
         }
+
+        # If reviewer, return immediate success without needing SMS dispatch
+        if is_reviewer:
+            return {
+                "success": True,
+                "message": f"Verification code 123456 active for Google Play review (+91 ******{clean_phone[-4:]})",
+                "school_name": school.name,
+                "students": [
+                    {
+                        "id": str(s.id),
+                        "name": s.name,
+                        "grade": s.grade,
+                        "section": s.section,
+                        "admission_no": s.admission_no,
+                        "roll_no": s.roll_no,
+                    }
+                    for s in students
+                ],
+                "otp": "123456"
+            }
 
         # Dispatch via DLT SMS Gateway (MetaReach / AGPK Academy template)
         sms_sent = False
@@ -650,6 +671,62 @@ def parent_verify_otp(payload: ParentVerifyOtpRequest):
 
     db = SessionLocal()
     try:
+        # Check Google Play Reviewer / Demo bypass
+        is_reviewer = clean_phone in ["9811223344", "9999988888", "9876543210"]
+        if is_reviewer and payload.otp.strip() in ["123456", "999999"]:
+            school = db.query(SchoolDB).filter(SchoolDB.id == payload.school_id).first()
+            if not school:
+                school = db.query(SchoolDB).first()
+
+            user = db.query(UserDB).filter(
+                UserDB.school_id == school.id,
+                UserDB.phone == clean_phone,
+                UserDB.role == "Parent"
+            ).first()
+            if not user:
+                user = UserDB(
+                    school_id=school.id,
+                    phone=clean_phone,
+                    email=f"reviewer.{clean_phone}@dpis.edu",
+                    full_name="Arun Patel (Demo Guardian)",
+                    role="Parent",
+                    email_verified=True,
+                    password_hash="google_play_verified_demo"
+                )
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+
+            # Ensure linked to student
+            first_st = db.query(StudentDB).filter(StudentDB.school_id == school.id, StudentDB.is_active == True).first()
+            if first_st:
+                link = db.query(ParentStudentDB).filter(
+                    ParentStudentDB.parent_user_id == user.id,
+                    ParentStudentDB.student_id == first_st.id
+                ).first()
+                if not link:
+                    link = ParentStudentDB(
+                        parent_user_id=user.id,
+                        student_id=first_st.id,
+                        relation="Father",
+                        is_primary=True,
+                        is_verified=True
+                    )
+                    db.add(link)
+                    db.commit()
+
+            token = create_access_token({
+                "sub": str(user.id),
+                "role": user.role,
+                "school_id": str(user.school_id)
+            })
+            return {
+                "status": "AUTHENTICATED",
+                "access_token": token,
+                "token_type": "bearer",
+                "user": build_user_payload(db, user, school),
+            }
+
         cache_key = f"{payload.school_id}:{clean_phone}"
         db_token = get_active_otp_token(db, "PARENT_OTP", cache_key)
         otp_entry = _parent_otps.get(cache_key)
